@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+.venv/
+venv/
+env/
+
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# evalctl working state: response cache + run artifacts.
+# Runs are reproducible from the suite + cache, so they are not committed.
+.evalctl/
+runs/
+
+.env
+*.local.yaml
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

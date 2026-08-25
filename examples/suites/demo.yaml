@@ -1,0 +1,48 @@
+# Offline demo. Runs with no API keys and no network: both "models" are the
+# deterministic `mock` provider, so a fresh clone produces the same numbers on
+# every machine. See examples/suites/production.yaml for the real thing.
+name: demo
+description: >
+  Five tasks, two simulated models of different ability, graded by exact match,
+  numeric tolerance, choice extraction, JSON structure and a rubric judge.
+
+tasks:
+  - ../tasks/*.yaml
+
+models:
+  - id: baseline
+    provider: mock
+    model: sim-small
+    params:
+      ability: 0.58      # true accuracy -- the number the CI should recover
+      spread: 0.7        # how much per-case difficulty moves it
+      verbosity: 0.35    # wraps correct answers in prose, exercising normalizers
+      seed: 1
+
+  - id: candidate
+    provider: mock
+    model: sim-large
+    params:
+      ability: 0.74
+      spread: 0.7
+      verbosity: 0.2
+      seed: 1
+
+judge:
+  provider: mock
+  model: sim-judge
+  samples: 3           # median of 3, so judge noise is measured not hidden
+  params:
+    judge_noise: 0.3
+    seed: 7
+
+# Three draws per case. Repeats average out sampling noise within a case; they
+# do not substitute for having more cases, which is what the interval is over.
+repeats: 3
+seed: 11
+errors: zero
+
+limits:
+  max_concurrency: 16
+  requests_per_minute: 0     # 0 = unlimited; the mock has no server to protect
+  tokens_per_minute: 0

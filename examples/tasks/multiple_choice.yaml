@@ -1,0 +1,102 @@
+id: science/multiple-choice
+description: Single-letter multiple choice. Exercises answer extraction from prose.
+tags: [science, multiple-choice]
+
+prompt:
+  system: Think briefly, then give the letter of the correct option.
+  user: |
+    {{ question }}
+
+    A) {{ a }}
+    B) {{ b }}
+    C) {{ c }}
+    D) {{ d }}
+
+# `choice` takes the LAST standalone letter, so "I said A, but actually C"
+# resolves to C. Exact matching would score that wrong for the wrong reason.
+scoring:
+  - type: choice
+    target: "{{ answer }}"
+    options: [A, B, C, D]
+
+cases:
+  - id: photosynthesis
+    vars:
+      question: Which gas do plants primarily absorb during photosynthesis?
+      a: Oxygen
+      b: Carbon dioxide
+      c: Nitrogen
+      d: Hydrogen
+      answer: B
+  - id: ph
+    vars:
+      question: A solution with pH 3 is best described as
+      a: Strongly basic
+      b: Neutral
+      c: Acidic
+      d: Amphoteric
+      answer: C
+  - id: orbit
+    vars:
+      question: Roughly how long does light take to travel from the Sun to Earth?
+      a: 8 seconds
+      b: 8 minutes
+      c: 8 hours
+      d: 8 days
+      answer: B
+  - id: dna
+    vars:
+      question: Which base pairs with adenine in DNA?
+      a: Guanine
+      b: Cytosine
+      c: Uracil
+      d: Thymine
+      answer: D
+  - id: density
+    vars:
+      question: An object floats in water. Its density is
+      a: Greater than water
+      b: Equal to water
+      c: Less than water
+      d: Independent of water
+      answer: C
+  - id: electricity
+    vars:
+      question: Doubling the resistance in a circuit at constant voltage does what to the current?
+      a: Doubles it
+      b: Halves it
+      c: Leaves it unchanged
+      d: Quadruples it
+      answer: B
+  - id: plate
+    vars:
+      question: Earthquakes occur most often at
+      a: The centre of tectonic plates
+      b: Plate boundaries
+      c: The magnetic poles
+      d: Deep ocean basins only
+      answer: B
+  - id: states
+    vars:
+      question: Sublimation is the transition from
+      a: Liquid to gas
+      b: Solid to liquid
+      c: Solid to gas
+      d: Gas to liquid
+      answer: C
+  - id: immune
+    vars:
+      question: Vaccines work primarily by
+      a: Killing circulating pathogens directly
+      b: Training adaptive immune memory
+      c: Raising body temperature
+      d: Blocking cell division
+      answer: B
+  - id: gravity
+    vars:
+      question: On the Moon, an astronaut's mass compared with on Earth is
+      a: Six times smaller
+      b: Six times larger
+      c: Unchanged
+      d: Zero
+      answer: C

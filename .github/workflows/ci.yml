@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+        exclude:
+          # One Python per non-Linux runner is enough to catch platform issues
+          # (path handling, console encoding) without tripling CI time.
+          - {os: windows-latest, python: "3.10"}
+          - {os: macos-latest, python: "3.10"}
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Specs are valid
+        run: |
+          evalctl validate examples/suites/demo.yaml
+          evalctl validate examples/suites/production.yaml
+
+      # The demo runs against the offline mock provider, so this is a real
+      # end-to-end check of render -> cache -> score -> persist -> analyse
+      # with no API keys and no network.
+      - name: End-to-end demo run
+        run: evalctl run examples/suites/demo.yaml --no-progress --fail-under 0.4
+
+      - name: Diff reaches a verdict
+        run: evalctl diff latest:candidate latest:baseline --cluster-by case --format json
+
+      - name: Resume is a no-op on a finished run
+        run: evalctl run examples/suites/demo.yaml --resume latest --no-progress
+
+      - name: Reports render in every format
+        run: |
+          evalctl report latest --format md
+          evalctl report latest --format json
+          evalctl show latest --failures -n 3
+          evalctl cache stats

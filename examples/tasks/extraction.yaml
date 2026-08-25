@@ -1,0 +1,64 @@
+id: extraction/structured
+description: Pull fields out of free text and return them as JSON.
+tags: [extraction, structured-output]
+
+prompt:
+  system: |
+    Extract the requested fields and reply with a single JSON object.
+    Use exactly the keys asked for. No commentary.
+  user: |
+    Fields: {{ fields }}
+
+    Text:
+    {{ text }}
+
+# `subset` mode ignores extra keys the model volunteers and awards partial
+# credit per matched field, so "3 of 4 fields right" is distinguishable from
+# "returned nothing" -- which matters when you are debugging a format change.
+scoring:
+  - type: json_match
+    target: "{{ expected }}"
+    mode: subset
+    partial_credit: true
+
+cases:
+  - id: invoice
+    vars:
+      fields: invoice_id, total, currency
+      text: Invoice INV-2291 was issued on 3 March for a total of 1,240.50 EUR.
+      expected: '{"invoice_id": "INV-2291", "total": 1240.5, "currency": "EUR"}'
+  - id: flight
+    vars:
+      fields: airline, flight_number, departure_city
+      text: BA117 departs London Heathrow at 08:40, operated by British Airways.
+      expected: '{"airline": "British Airways", "flight_number": "BA117", "departure_city": "London"}'
+  - id: person
+    vars:
+      fields: name, role, company
+      text: Priya Raman joined Northwind Labs last spring as head of platform engineering.
+      expected: '{"name": "Priya Raman", "role": "head of platform engineering", "company": "Northwind Labs"}'
+  - id: order
+    vars:
+      fields: item, quantity, unit_price
+      text: The customer ordered 12 units of the M4 bolt at 0.35 each.
+      expected: '{"item": "M4 bolt", "quantity": 12, "unit_price": 0.35}'
+  - id: incident
+    vars:
+      fields: service, severity, duration_minutes
+      text: The checkout service was degraded at SEV2 for 47 minutes before recovering.
+      expected: '{"service": "checkout", "severity": "SEV2", "duration_minutes": 47}'
+  - id: lease
+    vars:
+      fields: address, monthly_rent, term_months
+      text: Unit 4B at 19 Alder Street lets for 1,850 a month on a twelve month term.
+      expected: '{"address": "19 Alder Street", "monthly_rent": 1850, "term_months": 12}'
+  - id: paper
+    vars:
+      fields: title, year, venue
+      text: "Attention Is All You Need appeared at NeurIPS in 2017."
+      expected: '{"title": "Attention Is All You Need", "year": 2017, "venue": "NeurIPS"}'
+  - id: shipment
+    vars:
+      fields: tracking, carrier, weight_kg
+      text: Parcel 1Z999AA10123456784 shipped via UPS weighing 3.2 kg.
+      expected: '{"tracking": "1Z999AA10123456784", "carrier": "UPS", "weight_kg": 3.2}'

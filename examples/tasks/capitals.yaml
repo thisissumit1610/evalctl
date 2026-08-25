@@ -1,0 +1,40 @@
+id: factual/capitals
+description: Short-answer world knowledge. Tests recall plus answer formatting.
+tags: [factual, short-answer]
+
+prompt:
+  system: Answer with the place name only. No sentence, no punctuation.
+  user: What is the capital of {{ country }}?
+
+# `any_of` accepts the alternative names a correct answer can legitimately take.
+# Without it this task would measure transliteration preferences, not knowledge.
+scoring:
+  - type: exact_match
+    target: "{{ answer }}"
+    any_of: "{{ aliases }}"
+    case_sensitive: false
+
+cases:
+  - id: australia
+    vars: { country: Australia, answer: Canberra, aliases: [] }
+  - id: brazil
+    vars: { country: Brazil, answer: Brasilia, aliases: ["Brasília"] }
+  - id: canada
+    vars: { country: Canada, answer: Ottawa, aliases: [] }
+  - id: kazakhstan
+    vars: { country: Kazakhstan, answer: Astana, aliases: ["Nur-Sultan"] }
+  - id: myanmar
+    vars: { country: Myanmar, answer: Naypyidaw, aliases: ["Nay Pyi Taw", "Naypyitaw"] }
+  - id: switzerland
+    vars: { country: Switzerland, answer: Bern, aliases: ["Berne"] }
+  - id: turkey
+    vars: { country: Turkey, answer: Ankara, aliases: [] }
+  - id: south-africa
+    vars:
+      country: South Africa
+      answer: Pretoria
+      aliases: ["Cape Town", "Bloemfontein"]
+  - id: bolivia
+    vars: { country: Bolivia, answer: Sucre, aliases: ["La Paz"] }
+  - id: nigeria
+    vars: { country: Nigeria, answer: Abuja, aliases: [] }

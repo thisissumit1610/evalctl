@@ -1,0 +1,67 @@
+id: math/word-problems
+description: Multi-step arithmetic word problems with a single numeric answer.
+tags: [math, reasoning]
+
+prompt:
+  system: |
+    You are a careful assistant. Work through the problem, then end your reply
+    with the final answer on its own line.
+  user: |
+    {{ question }}
+
+# `numeric` reads the LAST number in the response, so showing working does not
+# cost the model marks. The tolerance covers float formatting, not wrong maths.
+scoring:
+  - type: numeric
+    target: "{{ answer }}"
+    tolerance: 0.001
+
+cases:
+  - id: apples
+    vars:
+      question: A crate holds 24 apples. Maya buys 3 crates and gives away 17 apples. How many are left?
+      answer: 55
+  - id: trains
+    vars:
+      question: A train covers 240 km in 3 hours. At the same speed, how far does it travel in 7 hours?
+      answer: 560
+  - id: discount
+    vars:
+      question: A jacket costs 80 dollars. It is discounted 25%, then 10 dollars is taken off at the till. What is the final price in dollars?
+      answer: 50
+  - id: interest
+    vars:
+      question: You deposit 1500 dollars at 4% simple annual interest. How much interest accrues over 3 years, in dollars?
+      answer: 180
+  - id: recipe
+    vars:
+      question: A recipe for 4 people needs 300 g of rice. How many grams are needed for 10 people?
+      answer: 750
+  - id: fence
+    vars:
+      question: A rectangular garden is 12 m by 8 m. How many metres of fencing enclose it completely?
+      answer: 40
+  - id: average
+    vars:
+      question: Test scores are 78, 84, 91 and 67. What is the mean, to one decimal place?
+      answer: 80
+  - id: workers
+    vars:
+      question: Six workers build a wall in 12 days. At the same rate, how many days would 8 workers take?
+      answer: 9
+  - id: tank
+    vars:
+      question: A tank holds 450 litres and is 60% full. How many more litres are needed to fill it?
+      answer: 180
+  - id: tiles
+    vars:
+      question: A floor is 5 m by 4 m. Tiles are 50 cm squares. How many tiles cover the floor?
+      answer: 80
+  - id: change
+    vars:
+      question: You buy 3 items at 4.50 each and pay with a 20 note. How much change do you get?
+      answer: 6.5
+  - id: population
+    vars:
+      question: A town of 12000 people grows by 5% in a year. How many people live there after that year?
+      answer: 12600

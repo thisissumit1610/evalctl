@@ -1,0 +1,88 @@
+id: writing/summarize
+description: |
+  One-sentence summaries. There is no answer key here, which is exactly when a
+  rubric judge earns its cost -- and the reference answer keeps the judge
+  grading agreement rather than taste.
+tags: [writing, judged]
+
+prompt:
+  system: Summarise the passage in exactly one sentence. No preamble.
+  user: |
+    {{ passage }}
+
+scoring:
+  # A cheap deterministic guard runs first and is `required`: a summary that
+  # leaks the prompt or answers in five paragraphs fails regardless of what the
+  # judge thinks. Structure this way round and the judge never has to be
+  # trusted with the pass/fail bit.
+  - type: not_contains
+    name: no_preamble
+    any_of: ["Here is", "Here's a summary", "Sure,"]
+    weight: 0.0
+
+  - type: llm_judge
+    name: quality
+    weight: 1.0
+    threshold: 0.6
+    scale: 4
+    question: "Summarise in one sentence: {{ passage }}"
+    reference: "{{ reference }}"
+    rubric:
+      - id: faithfulness
+        weight: 2
+        description: >
+          Is every claim supported by the passage? Invented specifics, numbers
+          or causes score 0 on this criterion regardless of fluency.
+      - id: coverage
+        weight: 1
+        description: Does it capture the passage's main point rather than a side detail?
+      - id: brevity
+        weight: 1
+        description: Is it a single sentence of reasonable length?
+
+cases:
+  - id: monsoon
+    vars:
+      passage: >
+        The monsoon arrived eleven days late this year. Farmers in the district
+        delayed sowing, and the agriculture department estimates the rice crop
+        will come in about a fifth below last season. Reservoir levels remain
+        below the ten-year average.
+      reference: A late monsoon delayed sowing and is expected to cut the district's rice crop by roughly 20%.
+  - id: recall
+    vars:
+      passage: >
+        The manufacturer recalled 40,000 units after reports that the battery
+        housing could overheat during fast charging. No injuries were reported.
+        Owners can request a free replacement module through the support site.
+      reference: A manufacturer recalled 40,000 units over a fast-charging overheating risk and is offering free replacement modules.
+  - id: telescope
+    vars:
+      passage: >
+        Astronomers using the new survey telescope catalogued 1,200 previously
+        unrecorded asteroids in its first six months. None are on trajectories
+        that intersect Earth's orbit. The team expects the rate to rise as
+        calibration improves.
+      reference: A new survey telescope found 1,200 unknown asteroids in six months, none of them Earth-crossing.
+  - id: strike
+    vars:
+      passage: >
+        Rail workers accepted a three-year pay deal, ending a dispute that had
+        caused eleven strike days since March. The agreement includes a 5.5%
+        rise in the first year and commitments on rostering.
+      reference: Rail workers ended an eleven-day strike campaign by accepting a three-year deal starting with a 5.5% rise.
+  - id: trial
+    vars:
+      passage: >
+        In a trial of 900 patients, the drug reduced hospital admissions by 18%
+        compared with standard care. Side effects were mild and the effect was
+        largest in patients over 65. Regulators have asked for longer follow-up
+        before approval.
+      reference: A 900-patient trial found the drug cut hospital admissions 18%, most in over-65s, though regulators want longer follow-up.
+  - id: library
+    vars:
+      passage: >
+        The city library extended Sunday opening after a pilot showed weekend
+        visits rose by a third. Funding comes from a two-year grant. Staff
+        numbers are unchanged, with existing hours redistributed.
+      reference: The city library made Sunday opening permanent after a pilot lifted weekend visits by a third, funded by a two-year grant.

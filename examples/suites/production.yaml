@@ -1,0 +1,54 @@
+# A real suite. Needs ANTHROPIC_API_KEY and OPENAI_API_KEY.
+#
+#   evalctl run examples/suites/production.yaml --dry-run   # cost first
+#   evalctl run examples/suites/production.yaml
+name: production
+description: The same five tasks against two live models, with a live rubric judge.
+
+tasks:
+  - ../tasks/*.yaml
+
+models:
+  - id: sonnet
+    provider: anthropic
+    model: claude-sonnet-5
+    params:
+      temperature: 0.0
+      max_tokens: 512
+    pricing:            # USD per million tokens; drives cost + --dry-run
+      input_per_mtok: 3.0
+      output_per_mtok: 15.0
+
+  - id: gpt
+    provider: openai
+    model: gpt-4o-mini
+    params:
+      temperature: 0.0
+      max_tokens: 512
+    pricing:
+      input_per_mtok: 0.15
+      output_per_mtok: 0.60
+
+# The judge is a separate endpoint on purpose: it should not change when the
+# model under test does, or the measuring stick moves with the thing measured.
+judge:
+  provider: anthropic
+  model: claude-sonnet-5
+  samples: 3
+  params:
+    temperature: 0.0
+    max_tokens: 400
+  pricing:
+    input_per_mtok: 3.0
+    output_per_mtok: 15.0
+
+repeats: 1        # temperature 0 -- extra draws buy almost nothing
+seed: 11
+errors: zero      # a provider refusal is a failed answer, not a missing one
+
+limits:
+  max_concurrency: 8
+  requests_per_minute: 50
+  tokens_per_minute: 80000
+  max_retries: 5
+  timeout_s: 120
