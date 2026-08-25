@@ -1,5 +1,9 @@
 # evalctl
 
+[![ci](https://github.com/thisissumit1610/evalctl/actions/workflows/ci.yml/badge.svg)](https://github.com/thisissumit1610/evalctl/actions/workflows/ci.yml)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 An LLM evaluation harness. Benchmark tasks are YAML specs; `evalctl` runs them
 against several model APIs with rate limiting and response caching, scores them
 with exact-match rules and a rubric-based LLM judge, and **diffs two runs with
@@ -244,8 +248,9 @@ written into the run manifest instead of hidden in a private cleanup pass.
 
 ## What runs it
 
-| providers | `anthropic`, `openai`, `openai-compat`, plus `ollama` / `vllm` / `together` / `groq` / `openrouter` aliases, and `mock` |
+| | |
 | :--- | :--- |
+| **providers** | `anthropic`, `openai`, `openai-compat`, plus `ollama` / `vllm` / `together` / `groq` / `openrouter` aliases, and `mock` |
 | **scorers** | `exact_match`, `contains`, `not_contains`, `regex`, `numeric`, `choice`, `json_match`, `llm_judge` |
 | **normalizers** | 19, including `strip_thinking`, `extract_boxed`, `extract_choice`, `extract_last_number`, `strip_code_fence` |
 
@@ -262,7 +267,8 @@ pip install -e ".[dev]"
 pytest
 ```
 
-184 tests, no network, about 20 seconds. The statistics are verified by
+184 tests, no network, about 20 seconds. CI runs them on Linux, macOS and
+Windows across Python 3.10 and 3.13, then executes the demo suite end to end. The statistics are verified by
 simulation rather than by golden values — `test_stats.py` checks that a nominal
 95% interval covers the true value about 95% of the time, and that the
 cluster-aware interval keeps its coverage on correlated data where the naive
